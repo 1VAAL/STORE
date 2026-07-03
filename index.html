@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>أنمي ستور</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Almarai:wght@700;800&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="topbar">🚚 شحن مجاني على الطلبات فوق 50$ — خصومات الموسم لحد نهاية الشهر</div>
+
+<header>
+  <div class="logo" onclick="navigate('home')">أنمي ستور</div>
+  <nav class="main-nav">
+    <a onclick="navigate('home')">الرئيسية</a>
+    <a onclick="navigate('shop')">المتجر</a>
+    <a onclick="navigate('home')">التصنيفات</a>
+    <a onclick="navigate('offers')">العروض</a>
+    <a id="nav-offers-publish" style="display:none" onclick="navigate('publish')">نشر عرض</a>
+    <a onclick="navigate('contact')">تواصل معنا</a>
+  </nav>
+  <div class="header-icons">
+    <div class="search-wrap">
+      <input type="text" placeholder="ابحث عن منتج..." oninput="onSearchInput(this.value)">
+      <div class="search-suggestions" id="search-suggestions"></div>
+    </div>
+    <div class="dropdown" id="account-dropdown">
+      <button class="icon-btn" onclick="document.getElementById('account-dropdown').classList.toggle('open')">👤</button>
+      <div class="dropdown-content" id="account-menu"></div>
+    </div>
+    <button class="icon-btn" onclick="navigate('wishlist')">❤️</button>
+    <button class="icon-btn" onclick="navigate('cart')">
+      🛒<span class="badge-count" id="cart-count">0</span>
+    </button>
+  </div>
+</header>
+
+<!-- ============================= الرئيسية ============================= -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <h1>عالمك المفضل من الأنمي والجيمنج</h1>
+    <p>فيجرز، بلوشيز، ملابس وإكسسوارات أصلية 100%</p>
+    <button class="btn" onclick="navigate('shop')">تسوق الآن</button>
+  </div>
+  <div class="section">
+    <h2>تصفح حسب التصنيف</h2>
+    <div class="categories-grid" id="home-categories"></div>
+  </div>
+  <div class="section">
+    <h2>منتجات مميزة</h2>
+    <div class="products-grid" id="home-featured"></div>
+  </div>
+</div>
+
+<!-- ============================= المتجر ============================= -->
+<div class="page" id="page-shop">
+  <div class="section">
+    <h2>المتجر</h2>
+    <div class="filters-bar">
+      <select id="cat-filter" onchange="onCategoryFilterChange(this.value)"></select>
+      <label>السعر حتى <span id="price-filter-label">$1000</span></label>
+      <input type="range" min="0" max="100" value="100" oninput="onPriceFilterChange(this.value)">
+    </div>
+    <div class="products-grid" id="shop-grid"></div>
+  </div>
+</div>
+
+<!-- ============================= تفاصيل المنتج ============================= -->
+<div class="page" id="page-product">
+  <div class="pd-wrap" id="product-detail-content"></div>
+  <div class="section">
+    <h2>مراجعات العملاء</h2>
+    <div id="reviews-list"></div>
+  </div>
+  <div class="section">
+    <h2>منتجات مشابهة</h2>
+    <div class="products-grid" id="related-products"></div>
+  </div>
+</div>
+
+<!-- ============================= السلة ============================= -->
+<div class="page" id="page-cart">
+  <div class="section" style="max-width:640px;">
+    <h2>سلة التسوق</h2>
+    <div id="cart-content"></div>
+  </div>
+</div>
+
+<!-- ============================= الدفع ============================= -->
+<div class="page" id="page-checkout">
+  <div class="section" style="max-width:640px;">
+    <h2>إتمام الشراء</h2>
+    <form id="checkout-form" class="auth-form">
+      <h4>معلومات الشحن</h4>
+      <input type="text" placeholder="الاسم الكامل" required>
+      <input type="text" placeholder="العنوان بالتفصيل" required>
+      <input type="tel" placeholder="رقم الهاتف" required>
+      <h4>شركة الشحن</h4>
+      <select required>
+        <option value="">اختر شركة الشحن</option>
+        <option>أرامكس</option>
+        <option>بوسطة</option>
+        <option>DHL</option>
+      </select>
+      <h4>طريقة الدفع</h4>
+      <select required>
+        <option value="">اختر طريقة الدفع</option>
+        <option>الدفع عند الاستلام</option>
+        <option>بطاقة ائتمان</option>
+        <option>PayPal</option>
+      </select>
+      <h4>ملخص الطلب</h4>
+      <div id="checkout-summary"></div>
+      <button type="submit" class="btn">تأكيد الشراء</button>
+    </form>
+  </div>
+</div>
+
+<!-- ============================= المفضلة ============================= -->
+<div class="page" id="page-wishlist">
+  <div class="section">
+    <h2>المفضلة</h2>
+    <div class="products-grid" id="wishlist-grid"></div>
+  </div>
+</div>
+
+<!-- ============================= العروض ============================= -->
+<div class="page" id="page-offers">
+  <div class="section">
+    <h2>العروض المنشورة</h2>
+    <div class="products-grid" id="offers-grid"></div>
+  </div>
+</div>
+
+<!-- ============================= نشر عرض ============================= -->
+<div class="page" id="page-publish">
+  <div class="section" style="max-width:520px;">
+    <h2>نشر عرض جديد</h2>
+    <div id="publish-content"></div>
+  </div>
+</div>
+
+<!-- ============================= لوحة الأدمن ============================= -->
+<div class="page" id="page-admin">
+  <div class="section">
+    <h2>لوحة الأدمن</h2>
+    <div id="admin-content"></div>
+  </div>
+</div>
+
+<!-- ============================= باقي الصفحات البسيطة ============================= -->
+<div class="page" id="page-orders">
+  <div class="section"><h2>طلباتي السابقة</h2><p class="muted">لسه معندكش طلبات سابقة.</p></div>
+</div>
+<div class="page" id="page-profile">
+  <div class="section"><h2>بيانات الحساب</h2><p class="muted">قريبًا: تعديل بيانات حسابك وعنوان الشحن.</p></div>
+</div>
+<div class="page" id="page-contact">
+  <div class="section"><h2>تواصل معنا</h2><p class="muted">راسلنا على: support@example.com</p></div>
+</div>
+
+<!-- ============================= Overlays ============================= -->
+<div class="overlay" id="auth-overlay">
+  <div class="sheet" id="auth-sheet"></div>
+</div>
+
+<!-- ============================= Footer ============================= -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <h5>روابط مهمة</h5>
+      <a onclick="navigate('shop')">المتجر</a>
+      <a onclick="navigate('offers')">العروض</a>
+      <a onclick="navigate('contact')">تواصل معنا</a>
+    </div>
+    <div>
+      <h5>السياسات</h5>
+      <a href="#">سياسة الخصوصية</a>
+      <a href="#">سياسة الإرجاع</a>
+      <a href="#">الأسئلة الشائعة</a>
+    </div>
+    <div>
+      <h5>تابعنا</h5>
+      <a href="#">Instagram</a>
+      <a href="#">TikTok</a>
+      <a href="#">Twitter / X</a>
+    </div>
+    <div>
+      <h5>وسائل الدفع</h5>
+      <span class="muted">💳 فيزا / ماستركارد · PayPal · الدفع عند الاستلام</span>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 أنمي ستور — جميع الحقوق محفوظة</div>
+</footer>
+
+<div id="toast"></div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/store.js"></script>
+<script src="js/publish.js"></script>
+</body>
+</html>
