@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function myRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isSuperAdmin() {
+      return isSignedIn() && request.auth.token.email == "osamabrazo@gmail.com";
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (myRole() == 'admin' || isSuperAdmin());
+    }
+
+    // ---------------- المستخدمون والرتب ----------------
+    match /users/{uid} {
+      allow read: if isSignedIn();
+      // إنشاء أول مرة يسجل فيها: يقدر ينشئ سجله هو بس، ورتبته الأساسية member
+      // إلا لو كان هو السوبر أدمن، ساعتها يقدر يبقى admin من أول تسجيل.
+      allow create: if isSignedIn() && request.auth.uid == uid
+                    && (request.resource.data.role == 'member' || isSuperAdmin());
+      // تعديل بياناته الشخصية (الاسم) يقدر بس هو، لكن تغيير الرتبة (role)
+      // مسموح بس للأدمن أو السوبر أدمن.
+      allow update: if isSignedIn() && (
+                      (request.auth.uid == uid && request.resource.data.role == resource.data.role)
+                      || isAdmin()
+                    );
+      allow delete: if isAdmin();
+    }
+
+    // ---------------- العروض المنشورة ----------------
+    match /offers/{offerId} {
+      allow read: if true; // العروض تظهر للجميع حتى الزوار
+      allow create: if isSignedIn() &&
+                      (myRole() == 'publisher' || myRole() == 'admin' || isSuperAdmin()) &&
+                      request.resource.data.authorUid == request.auth.uid;
+      allow update, delete: if isSignedIn() &&
+                      (resource.data.authorUid == request.auth.uid || isAdmin());
+    }
+  }
+}
